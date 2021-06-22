@@ -75,5 +75,59 @@ namespace React5.Services
             con.CloseConnetion();
             return courses;
         }
+        public static List<AllAboutCourse> GetAllAboutCourse(string courseId)
+        {
+            Console.WriteLine(courseId);
+            DatabaseCon con = new DatabaseCon();
+            con.OpenConnection();
+            List<AllAboutCourse> courses = new List<AllAboutCourse>();
+           string query = "SELECT subcourseid,subcoursename FROM subcourses WHERE courseid=@courseId";
+
+            SQLiteCommand myCommand = new SQLiteCommand(query, con.myConnection);
+            myCommand.Parameters.AddWithValue("@courseId", courseId);
+            SQLiteDataReader result = myCommand.ExecuteReader();
+            if (result.HasRows)
+            {
+                while (result.Read())
+                {
+                    AllAboutCourse obj = new AllAboutCourse();
+                    obj.subcourseid = result["subcourseid"].ToString();
+                    obj.subcoursename = result["subcoursename"].ToString();
+                    courses.Add(obj);
+                }
+            }
+            con.CloseConnetion();
+
+
+            for(int i=0;i < courses.Count;i++)
+            {
+                /*Console.WriteLine(sub.subcourseid + "  " + sub.subcoursename);*/
+                con.OpenConnection();
+                string query1 = "SELECT topicname,topicurl FROM topics WHERE subcourseid=@subcourseid";
+                SQLiteCommand myCommand1 = new SQLiteCommand(query1, con.myConnection);
+                myCommand1.Parameters.AddWithValue("@subcourseid", courses[i].subcourseid);
+                SQLiteDataReader result1 = myCommand1.ExecuteReader();
+                if (result1.HasRows)
+                {
+                    while (result1.Read())
+                    {
+                        
+                        courses[i].topicname = result1["topicname"].ToString();
+                        courses[i].topicurl = result1["topicurl"].ToString();
+                    }
+                }
+                Console.WriteLine(courses[i].subcourseid + "  " + courses[i].subcoursename + "  " + courses[i].topicname+"  "+courses[i].topicurl);
+                con.CloseConnetion();
+            }
+
+            for(int i = 0; i < courses.Count; i++)
+            {
+                Console.WriteLine(courses[i].subcourseid + "  " + courses[i].subcoursename + "  " + courses[i].topicname + "  " + courses[i].topicurl);
+            }
+
+            return courses;
+        }
+
+
     }
 }

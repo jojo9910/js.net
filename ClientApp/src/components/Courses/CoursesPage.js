@@ -51,8 +51,8 @@ export class CoursesPage extends Component {
     }
 
     async populateData() {
-        /*const response = await fetch('Course');*/
-        const response = await fetch('Course/getbydomain/Backend');
+        const response = await fetch('Course');
+        /*const response = await fetch('Course/getbydomain/Backend');*/
         /*const response = await fetch('Course/getbydomain/Frontend');*/
 
         const data = await response.json();

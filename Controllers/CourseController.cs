@@ -23,12 +23,25 @@ namespace React5.Controllers
         }
 
         [HttpGet]
+        [Route("{courseId}")]
+        public IEnumerable<AllAboutCourse> GetAllAboutCourse(string courseId)
+        {
+
+            List<AllAboutCourse>courses= CourseServices.GetAllAboutCourse(courseId);
+            for (int i = 0; i < courses.Count; i++)
+            {
+                Console.WriteLine(courses[i].subcourseid + "  " + courses[i].subcoursename + "  " + courses[i].topicname + "  " + courses[i].topicurl);
+            }
+            return courses;
+        }
+
+        [HttpGet]
         [Route("getbydomain/{Domain}")]
         public IEnumerable<Course> GetByDomain(string Domain)
         {
             return CourseServices.GetByDoamin(Domain);
         }
-
+       
         [HttpPost]
         public IActionResult Create([FromBody] Course newCourse)
         {
