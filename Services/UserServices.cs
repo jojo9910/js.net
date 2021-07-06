@@ -8,48 +8,16 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Threading.Tasks;
 using System.Data.SQLite;
 using React5.Database;
+using React5.Functions;
 
 namespace React5.Services
 {
     public class UserServices
     {
-        static string ComputeSha256Hash(string rawData)
-        {
-            // Create a SHA256   
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                // ComputeHash - returns byte array  
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-
-                // Convert byte array to a string   
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
-        public static bool ValidateCredentials(User user, string opreation)
-        {
-            if (opreation == "Register")
-            {
-                if (user.username == "" || user.mail == "" || user.hashpassword == "")
-                    return false;
-            }
-            else if (opreation == "Login")
-            {
-                if (user.mail == "" || user.hashpassword == "")
-                    return false;
-            }
-            return true;
-
-        }
-
         public static bool RegisterUser(User user)
         {
             bool valid = false;
-            if (!ValidateCredentials(user, "Register"))  /*validate credentials on backend side*/
+            if (!UserFunction.ValidateCredentials(user, "Register"))  /*validate credentials on backend side*/
             {
                 Console.WriteLine("Credentials required");
                 return false;  // redirect to signup page
@@ -59,7 +27,7 @@ namespace React5.Services
             {
                 string mail = Convert.ToString(user.mail);
                 string pass = Convert.ToString(user.hashpassword);
-                string hashed = ComputeSha256Hash(pass);
+                string hashed = UserFunction.ComputeSha256Hash(pass);
                 string username = Convert.ToString(user.username);
                 con.OpenConnection();
                 string query = "insert into user ('username', 'hashpassword', 'mail', 'rating') values(@username, @hashpassword, @mail, @rating)";
@@ -84,14 +52,14 @@ namespace React5.Services
         public static bool LoginUser(User user)
         {
             bool valid = false;
-            if (!ValidateCredentials(user, "Login"))
+            if (!UserFunction.ValidateCredentials(user, "Login"))
                 return valid;
             DatabaseCon con = new DatabaseCon();
             try
             {
                 string mail = Convert.ToString(user.mail);
                 string pass = Convert.ToString(user.hashpassword);
-                string hashed = ComputeSha256Hash(pass);
+                string hashed = UserFunction.ComputeSha256Hash(pass);
                 con.OpenConnection();
                 string query = "SELECT * FROM user where mail=@mail";
                 SQLiteCommand myCommand = new SQLiteCommand(query, con.myConnection);
